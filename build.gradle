@@ -1,0 +1,37 @@
+plugins {
+	id 'java'
+	id 'application'
+	id 'idea'		// optional (to generate IntelliJ IDEA project files)
+	id 'eclipse'	// optional (to generate Eclipse project files)
+}
+
+application {
+	mainClass = "jdraw.JDraw"
+}
+
+repositories {
+	mavenCentral()
+}
+
+java {
+	sourceCompatibility = JavaVersion.VERSION_21
+	targetCompatibility = JavaVersion.VERSION_21
+}
+
+compileJava.options.encoding = 'UTF-8'
+compileTestJava.options.encoding = 'UTF-8'
+
+dependencies {
+	implementation 'org.springframework:spring-context:4.3.19.RELEASE'
+	implementation 'org.apache.logging.log4j:log4j-core:2.15.0'
+	implementation 'org.apache.logging.log4j:log4j-1.2-api:2.15.0'
+	testImplementation 'org.junit.jupiter:junit-jupiter:5.10.0'
+	testImplementation 'org.mockito:mockito-core:3.12.4'
+}
+
+test {
+	useJUnitPlatform()
+	testLogging {
+		events "passed", "skipped", "failed"
+	}
+}
