@@ -9,9 +9,11 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.util.ArrayList;
 import java.util.List;
 
 import jdraw.framework.Figure;
+import jdraw.framework.FigureEvent;
 import jdraw.framework.FigureHandle;
 import jdraw.framework.FigureListener;
 
@@ -41,6 +43,11 @@ public class Rect implements Figure {
     private final Rectangle rectangle;
 
     /**
+     * List for FigureListeners
+     */
+    private List<FigureListener> listeners;
+
+    /**
      * Constructs a new rectangle with the specified position and dimensions.
      * 
      * @param x the x-coordinate of the upper-left corner of the rectangle
@@ -50,6 +57,7 @@ public class Rect implements Figure {
      */
     public Rect(int x, int y, int w, int h) {
         rectangle = new Rectangle(x, y, w, h);
+        listeners = new ArrayList<FigureListener>();
     }
 
     /**
@@ -76,7 +84,7 @@ public class Rect implements Figure {
     @Override
     public void setBounds(Point origin, Point corner) {
         rectangle.setFrameFromDiagonal(origin, corner);
-        // TODO notification of change
+        notifyListeners();
     }
 
     /**
@@ -88,7 +96,14 @@ public class Rect implements Figure {
     @Override
     public void move(int dx, int dy) {
         rectangle.setLocation(rectangle.x + dx, rectangle.y + dy);
-        // TODO notification of change
+        notifyListeners();
+
+    }
+
+    private void notifyListeners() {
+        for(FigureListener listener : listeners) {
+            listener.figureChanged(new FigureEvent(this));
+        }
     }
 
     /**
@@ -134,7 +149,7 @@ public class Rect implements Figure {
      */
     @Override
     public void addFigureListener(FigureListener listener) {
-        // TODO: Implement listener registration
+        listeners.add(listener);
     }
 
     /**
@@ -144,7 +159,7 @@ public class Rect implements Figure {
      */
     @Override
     public void removeFigureListener(FigureListener listener) {
-        // TODO: Implement listener removal
+        listeners.remove(listener);
     }
 
     /**

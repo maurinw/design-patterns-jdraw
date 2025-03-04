@@ -5,12 +5,18 @@
 
 package jdraw.std;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Stream;
 
 import jdraw.framework.DrawCommandHandler;
 import jdraw.framework.DrawModel;
+import jdraw.framework.DrawModelEvent;
 import jdraw.framework.DrawModelListener;
 import jdraw.framework.Figure;
+import jdraw.framework.FigureEvent;
+import jdraw.framework.FigureListener;
+import jdraw.framework.DrawModelEvent.Type;
 
 /**
  * The StdDrawModel class provides a standard implementation of the DrawModel
@@ -28,41 +34,54 @@ import jdraw.framework.Figure;
  * notifying listeners of changes, and integrating with the command handler for
  * undo/redo functionality.
  * 
- * @author TODO add your name here
+ * @author Maurin Wirth
  */
-public class StdDrawModel implements DrawModel {
+public class StdDrawModel implements DrawModel, FigureListener {
 
-    @Override
-    public void addFigure(Figure f) {
-        // TODO: Implement the logic to add a figure to the model and notify listeners
-        System.out.println("StdDrawModel.addFigure has to be implemented");
+    private List<DrawModelListener> listeners;
+    private List<Figure> figures;
+
+    public StdDrawModel(){
+        listeners = new ArrayList<DrawModelListener>();
+        figures = new ArrayList<Figure>();
+    }
+
+    private void notifyListeners(Figure f, Type t) {
+        for(DrawModelListener listener : listeners) {
+            listener.modelChanged(new DrawModelEvent(this, f, t));
+        }
     }
 
     @Override
-    public Stream<Figure> getFigures() {
-        // TODO: Implement the logic to return all figures in the model
-        System.out.println("StdDrawModel.getFigures has to be implemented");
-        return Stream.empty(); // Placeholder to ensure the application starts, replace with actual
-                               // implementation
+    public void addFigure(Figure f) {
+        if (figures.add(f)) {
+            f.addFigureListener(this);
+            notifyListeners(f, Type.FIGURE_ADDED);
+        }
     }
 
     @Override
     public void removeFigure(Figure f) {
-        // TODO: Implement the logic to remove a figure from the model and notify
-        // listeners
-        System.out.println("StdDrawModel.removeFigure has to be implemented");
+        if (figures.remove(f)) {
+            notifyListeners(f, Type.FIGURE_REMOVED);
+            f.removeFigureListener(this);
+        }
+    }
+
+    @Override
+    public Stream<Figure> getFigures() {
+        return figures.stream();
+                               
     }
 
     @Override
     public void addModelChangeListener(DrawModelListener listener) {
-        // TODO: Implement the logic to add a listener to the model.
-        System.out.println("StdDrawModel.addModelChangeListener has to be implemented");
+        listeners.add(listener);
     }
 
     @Override
     public void removeModelChangeListener(DrawModelListener listener) {
-        // TODO: Implement the logic to remove a listener from the model.
-        System.out.println("StdDrawModel.removeModelChangeListener has to be implemented");
+        listeners.remove(listener);
     }
 
     /** The draw command handler. Initialized here with a dummy implementation. */
@@ -82,13 +101,28 @@ public class StdDrawModel implements DrawModel {
 
     @Override
     public void setFigureIndex(Figure f, int index) {
-        // TODO: Implement the logic for setting the figure's index in the model.
-        System.out.println("StdDrawModel.setFigureIndex has to be implemented");
+        if(figures.contains(f)) {
+            figures.remove(f);
+            // Index innerhalb der gültigen Grenzen anpassen:
+            if (index < 0) {
+                index = 0;
+            } else if (index > figures.size()) {
+                index = figures.size();
+            }
+            figures.add(index, f);
+            // Informiere Listener über die Änderung.
+            notifyListeners(f, Type.FIGURE_ADDED);
+        }
     }
 
     @Override
     public void removeAllFigures() {
-        // TODO: Implement the logic to remove all figures from the model.
-        System.out.println("StdDrawModel.removeAllFigures has to be implemented");
+        figures.clear();
+        notifyListeners(null, Type.DRAWING_CLEARED);
+    }
+
+    @Override
+    public void figureChanged(FigureEvent e) {
+        notifyListeners(e.getFigure(), DrawModelEvent.Type.FIGURE_CHANGED);
     }
 }
