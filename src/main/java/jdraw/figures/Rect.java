@@ -96,12 +96,17 @@ public class Rect implements Figure {
     @Override
     public void move(int dx, int dy) {
         rectangle.setLocation(rectangle.x + dx, rectangle.y + dy);
-        notifyListeners();
-
+        if(!(dx == 0 && dy == 0)) {
+            notifyListeners();
+        }
     }
 
+     /**
+     * Notifies all registered listeners that the figure has changed.
+     */
     private void notifyListeners() {
-        for(FigureListener listener : listeners) {
+        // Über eine Kopie der Liste iterieren, um ConcurrentModification zu vermeiden
+        for (FigureListener listener : new ArrayList<>(listeners)) {
             listener.figureChanged(new FigureEvent(this));
         }
     }
@@ -149,7 +154,12 @@ public class Rect implements Figure {
      */
     @Override
     public void addFigureListener(FigureListener listener) {
-        listeners.add(listener);
+        if (listener == null) {  
+            return;
+        }
+        if (!listeners.contains(listener)) { 
+            listeners.add(listener);
+        }
     }
 
     /**
@@ -159,6 +169,9 @@ public class Rect implements Figure {
      */
     @Override
     public void removeFigureListener(FigureListener listener) {
+        if (listener == null) { 
+            return;
+        }
         listeners.remove(listener);
     }
 

@@ -101,18 +101,7 @@ public class StdDrawModel implements DrawModel, FigureListener {
 
     @Override
     public void setFigureIndex(Figure f, int index) {
-        if(figures.contains(f)) {
-            figures.remove(f);
-            // Index innerhalb der gültigen Grenzen anpassen:
-            if (index < 0) {
-                index = 0;
-            } else if (index > figures.size()) {
-                index = figures.size();
-            }
-            figures.add(index, f);
-            // Informiere Listener über die Änderung.
-            notifyListeners(f, Type.FIGURE_ADDED);
-        }
+        
     }
 
     @Override
