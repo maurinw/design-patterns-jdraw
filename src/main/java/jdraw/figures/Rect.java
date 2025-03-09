@@ -11,6 +11,7 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import jdraw.framework.Figure;
 import jdraw.framework.FigureEvent;
@@ -35,17 +36,10 @@ import jdraw.framework.FigureListener;
  * @author Christoph Denzler &amp; Dominik Gruntz
  */
 public class Rect implements Figure {
+
     private static final long serialVersionUID = 9120181044386552132L;
-
-    /**
-     * Use the java.awt.Rectangle in order to save/reuse code.
-     */
+    private List<FigureListener> listeners = new CopyOnWriteArrayList<>();
     private final Rectangle rectangle;
-
-    /**
-     * List for FigureListeners
-     */
-    private List<FigureListener> listeners;
 
     /**
      * Constructs a new rectangle with the specified position and dimensions.
@@ -57,7 +51,6 @@ public class Rect implements Figure {
      */
     public Rect(int x, int y, int w, int h) {
         rectangle = new Rectangle(x, y, w, h);
-        listeners = new ArrayList<FigureListener>();
     }
 
     /**
@@ -96,18 +89,8 @@ public class Rect implements Figure {
     @Override
     public void move(int dx, int dy) {
         rectangle.setLocation(rectangle.x + dx, rectangle.y + dy);
-        if (!(dx == 0 && dy == 0)) {
+        if (dx != 0 && dy != 0) {
             notifyListeners();
-        }
-    }
-
-    /**
-     * Notifies all registered listeners that the figure has changed.
-     */
-    private void notifyListeners() {
-        // Über eine Kopie der Liste iterieren, um ConcurrentModification zu vermeiden
-        for (FigureListener listener : new ArrayList<>(listeners)) {
-            listener.figureChanged(new FigureEvent(this));
         }
     }
 
@@ -184,6 +167,15 @@ public class Rect implements Figure {
     @Override
     public Figure clone() {
         return null;
+    }
+
+    /**
+     * Notifies all registered listeners that the figure has changed.
+     */
+    private void notifyListeners() {
+        for (FigureListener listener : listeners) {
+            listener.figureChanged(new FigureEvent(this));
+        }
     }
 
 }
