@@ -4,29 +4,25 @@ import jdraw.framework.DrawContext;
 import jdraw.framework.Figure;
 
 /**
- * A drawing tool for creating rectangle figures in the JDraw application.
- * This tool extends {@link AbstractDrawTool} and implements the creation of rectangle figures.
- * When the user clicks and drags on the canvas, a rectangle is created and added to the drawing model.
- *
- * @see AbstractDrawTool
+ * Tool for drawing rectangles.
  */
 public final class RectTool extends AbstractDrawTool {
 
     /**
-     * Constructs a new RectTool with the specified drawing context.
+     * Constructs the rectangle tool.
      *
-     * @param context the drawing context in which this tool operates
+     * @param context drawing context
      */
     public RectTool(DrawContext context) {
         super(context, "Rectangle", "rectangle.png");
     }
 
     /**
-     * Creates a new {@link Rect} figure at the specified position.
+     * Creates a new rectangle.
      *
-     * @param x the x-coordinate at which the rectangle is to be created
-     * @param y the y-coordinate at which the rectangle is to be created
-     * @return a new Rect with initial width and height of zero
+     * @param x x-coordinate
+     * @param y y-coordinate
+     * @return new rectangle
      */
     @Override
     protected Figure createFigureAt(int x, int y) {
