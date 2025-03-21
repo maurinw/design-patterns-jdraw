@@ -49,4 +49,5 @@ public abstract class AbstractFigure implements Figure {
     public List<? extends FigureHandle> getHandles() {
         return null;
     }
+
 }
