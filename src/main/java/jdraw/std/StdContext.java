@@ -25,6 +25,7 @@ import jdraw.framework.DrawTool;
 import jdraw.framework.DrawToolFactory;
 import jdraw.framework.DrawView;
 import jdraw.framework.Figure;
+import jdraw.grid.FixedGrid;
 
 /**
  * The StdContext class provides a standard implementation of the DrawContext
@@ -152,17 +153,26 @@ public class StdContext extends AbstractContext {
         editMenu.add(orderMenu);
 
         JMenu grid = new JMenu("Grid...");
-        grid.add("Grid 1");
-        grid.add("Grid 2");
-        grid.add("Grid 3");
         editMenu.add(grid);
+
+        grid.add(addFixedGridMenu("No Grid", null));
+        grid.add(addFixedGridMenu("Fixed 20", new FixedGrid(getView(), 20)));
+        grid.add(addFixedGridMenu("Fixed 100", new FixedGrid(getView(), 100)));
 
         return editMenu;
     }
 
+    private JMenuItem addFixedGridMenu(String label, FixedGrid grid) {
+        JMenuItem entry = new JMenuItem(label);
+        entry.addActionListener(e -> getView().setGrid(grid));
+        return entry;
+    }
+
     /**
-     * Creates and initializes the "File" menu, providing options for opening, saving, 
-     * and exiting the application. It sets up file choosers with filters for supported 
+     * Creates and initializes the "File" menu, providing options for opening,
+     * saving,
+     * and exiting the application. It sets up file choosers with filters for
+     * supported
      * file formats to manage file input and output operations.
      * 
      * @return the initialized "File" menu
@@ -189,7 +199,8 @@ public class StdContext extends AbstractContext {
     }
 
     /**
-     * Registers the default drawing tools available in the context, starting with the 
+     * Registers the default drawing tools available in the context, starting with
+     * the
      * rectangle tool. Additional tools can be added as needed.
      */
     @Override
