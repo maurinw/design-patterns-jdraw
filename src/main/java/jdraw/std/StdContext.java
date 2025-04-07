@@ -5,6 +5,7 @@
 package jdraw.std;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,6 +17,7 @@ import javax.swing.KeyStroke;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import jdraw.figures.Group;
 import jdraw.figures.LineTool;
 import jdraw.figures.OvalTool;
 import jdraw.figures.RectTool;
@@ -25,6 +27,7 @@ import jdraw.framework.DrawTool;
 import jdraw.framework.DrawToolFactory;
 import jdraw.framework.DrawView;
 import jdraw.framework.Figure;
+import jdraw.framework.FigureGroup;
 import jdraw.grid.FixedGrid;
 
 /**
@@ -133,12 +136,36 @@ public class StdContext extends AbstractContext {
         });
 
         editMenu.addSeparator();
+        
         JMenuItem group = new JMenuItem("Group");
-        group.setEnabled(false); // Future implementation can enable grouping functionality
+        group.addActionListener(e -> {
+            List<Figure> selection = getView().getSelection();
+            if (selection != null && selection.size() > 1) {
+                DrawModel model = getModel();
+                Group g = new Group(model, selection);
+            
+                for(Figure f : selection) {
+                    model.removeFigure(f);
+                }
+
+                model.addFigure(g);
+                getView().addToSelection(g);
+            }
+        });
         editMenu.add(group);
 
         JMenuItem ungroup = new JMenuItem("Ungroup");
-        ungroup.setEnabled(false); // Future implementation can enable ungrouping functionality
+        ungroup.addActionListener(e -> {
+            for(Figure g : getView().getSelection()) {
+                if (g instanceof FigureGroup) {
+                    getModel().removeFigure(g);
+                    ((FigureGroup)g).getFigureParts().forEach(f -> {
+                        getModel().addFigure(f);
+                        getView().addToSelection(f);
+                    });
+                }
+            }
+        });
         editMenu.add(ungroup);
 
         editMenu.addSeparator();
