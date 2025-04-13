@@ -26,6 +26,16 @@ public class Group extends AbstractFigure implements FigureGroup {
                 .collect(Collectors.toList());
     }
 
+    public Group(Group source) {
+        super(source);
+        parts = source.parts.stream().map(Figure::clone).toList();
+    }
+
+    @Override
+    public Group clone() {
+        return new Group(this);
+    }
+
     @Override
     public void draw(Graphics g) {
         parts.forEach(figure -> figure.draw(g));

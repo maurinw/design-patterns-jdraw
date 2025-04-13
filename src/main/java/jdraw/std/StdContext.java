@@ -10,6 +10,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import java.awt.event.ActionListener;
+
 import javax.swing.JFileChooser;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -59,6 +61,8 @@ import jdraw.grid.FixedGrid;
 @SuppressWarnings("serial")
 public class StdContext extends AbstractContext {
 
+    private List<Figure> clipboard;
+
     /**
      * Constructs a standard context with a default set of drawing tools.
      * 
@@ -78,6 +82,7 @@ public class StdContext extends AbstractContext {
      */
     public StdContext(DrawView view, List<DrawToolFactory> toolFactories) {
         super(view, toolFactories);
+        clipboard = new ArrayList<>();
     }
 
     /**
@@ -123,9 +128,34 @@ public class StdContext extends AbstractContext {
 
         editMenu.addSeparator();
 
-        editMenu.add("Cut").setEnabled(false);
-        editMenu.add("Copy").setEnabled(false);
-        editMenu.add("Paste").setEnabled(false);
+       ActionListener cutAction = e -> {
+            clipboard.clear();
+            for (Figure figure : sortInModelOrder(getView().getSelection())) {
+                clipboard.add(figure);
+                getModel().removeFigure(figure);
+            }
+        };
+        editMenu.add(createMenuItem("Cut", cutAction, "control X"));
+
+        ActionListener copyAction = e -> {
+            clipboard.clear();
+            for (Figure figure : sortInModelOrder(getView().getSelection())) {
+                clipboard.add(figure.clone());
+            }
+        };
+        editMenu.add(createMenuItem("Copy", copyAction, "control C"));
+
+        JMenuItem paste = new JMenuItem("Paste");
+        paste.addActionListener(e -> {
+            getView().clearSelection();
+            for (Figure figure : clipboard) {
+                Figure clone = figure.clone();
+                getModel().addFigure(clone);
+                getView().addToSelection(clone);
+            }
+        });
+        paste.setAccelerator(KeyStroke.getKeyStroke("control V"));
+        editMenu.add(paste);
 
         editMenu.addSeparator();
 
@@ -136,15 +166,15 @@ public class StdContext extends AbstractContext {
         });
 
         editMenu.addSeparator();
-        
+
         JMenuItem group = new JMenuItem("Group");
         group.addActionListener(e -> {
             List<Figure> selection = getView().getSelection();
             if (selection != null && selection.size() > 1) {
                 DrawModel model = getModel();
                 Group g = new Group(model, selection);
-            
-                for(Figure f : selection) {
+
+                for (Figure f : selection) {
                     model.removeFigure(f);
                 }
 
@@ -156,10 +186,10 @@ public class StdContext extends AbstractContext {
 
         JMenuItem ungroup = new JMenuItem("Ungroup");
         ungroup.addActionListener(e -> {
-            for(Figure g : getView().getSelection()) {
+            for (Figure g : getView().getSelection()) {
                 if (g instanceof FigureGroup) {
                     getModel().removeFigure(g);
-                    ((FigureGroup)g).getFigureParts().forEach(f -> {
+                    ((FigureGroup) g).getFigureParts().forEach(f -> {
                         getModel().addFigure(f);
                         getView().addToSelection(f);
                     });
@@ -193,6 +223,20 @@ public class StdContext extends AbstractContext {
         JMenuItem entry = new JMenuItem(label);
         entry.addActionListener(e -> getView().setGrid(grid));
         return entry;
+    }
+
+    private JMenuItem createMenuItem(String label, ActionListener listener, String shortCut) {
+        JMenuItem item = new JMenuItem(label);
+        item.addActionListener(listener);
+        item.setAccelerator(KeyStroke.getKeyStroke(shortCut));
+        return item;
+    }
+
+    private List<Figure> sortInModelOrder(List<Figure> selection) {
+        return getModel()
+            .getFigures()
+            .filter(selection::contains)
+            .collect(Collectors.toList());
     }
 
     /**

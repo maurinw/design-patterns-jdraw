@@ -10,7 +10,7 @@ import java.awt.geom.Ellipse2D.Float;
  */
 public class Oval extends AbstractRectangularFigure {
 
-    private final java.awt.geom.Ellipse2D.Float ellipse;
+    private java.awt.geom.Ellipse2D.Float ellipse;
 
     /**
      * Constructs a new oval.
@@ -23,6 +23,16 @@ public class Oval extends AbstractRectangularFigure {
     protected Oval(int x, int y, int w, int h) {
         super(x, y);
         ellipse = new Float(x, y, 0, 0);
+    }
+
+    public Oval(Oval source) {
+        super(source);
+        ellipse = (java.awt.geom.Ellipse2D.Float)source.ellipse.clone();
+    }
+
+    @Override
+    public Oval clone() {
+        return new Oval(this);
     }
 
     /** Draws the oval. */

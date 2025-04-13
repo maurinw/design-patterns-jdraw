@@ -36,6 +36,14 @@ public abstract class AbstractFigure implements SwappableFigure {
     /** List of listeners. */
     private final List<FigureListener> observers = new CopyOnWriteArrayList<>();
 
+    protected AbstractFigure(AbstractFigure source) {
+
+    }
+
+    public AbstractFigure() {
+        
+    }
+
     /** Adds a listener. */
     @Override
     public void addFigureListener(FigureListener listener) {

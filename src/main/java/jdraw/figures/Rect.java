@@ -35,6 +35,10 @@ public class Rect extends AbstractRectangularFigure {
         this(x, y, 0, 0);
     }
 
+    public Rect(Rect source) {
+        super(source);
+    }
+
     /** Draws the rectangle. */
     @Override
     public void draw(Graphics g) {
@@ -43,6 +47,11 @@ public class Rect extends AbstractRectangularFigure {
         g.fillRect(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
         g.setColor(Color.BLACK);
         g.drawRect(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
+    }
+
+    @Override
+    public Rect clone() {
+        return new Rect(this);
     }
 
 }

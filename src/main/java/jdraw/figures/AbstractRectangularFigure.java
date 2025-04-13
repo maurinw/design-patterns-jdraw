@@ -12,6 +12,10 @@ public abstract class AbstractRectangularFigure extends AbstractFigure {
     /** Rectangle bounds. */
     private final Rectangle rectangle;
 
+    protected AbstractRectangularFigure() {
+        this(0, 0);
+    }
+
     /**
      * Constructs a rectangular figure.
      *
@@ -20,6 +24,11 @@ public abstract class AbstractRectangularFigure extends AbstractFigure {
      */
     protected AbstractRectangularFigure(int x, int y) {
         this.rectangle = new Rectangle(x, y, 0, 0);
+    }
+
+    protected AbstractRectangularFigure(AbstractRectangularFigure source) {
+        super(source);
+        this.rectangle = (Rectangle)source.rectangle.clone();
     }
 
     /** Moves the figure. */
